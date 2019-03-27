@@ -1,6 +1,6 @@
 <?php
 
-namespace API\Message\Command;
+namespace Kdubuc\Message\Command;
 
 class Handler
 {

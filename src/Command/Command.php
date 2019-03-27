@@ -1,9 +1,17 @@
 <?php
 
-namespace API\Message\Command;
+namespace Kdubuc\Message\Command;
 
-use API\Message\Message;
+use Kdubuc\Message\Message;
+use League\Tactician\Plugins\NamedCommand\NamedCommand;
 
-abstract class Command extends Message
+abstract class Command extends Message implements NamedCommand
 {
+    /**
+     * Returns the name of the command.
+     */
+    public function getCommandName()
+    {
+        return $this->getName();
+    }
 }

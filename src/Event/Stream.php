@@ -1,6 +1,6 @@
 <?php
 
-namespace API\Message\Event;
+namespace Kdubuc\Message\Event;
 
 use Exception;
 use Traversable;
@@ -31,43 +31,32 @@ class Stream extends Emitter implements IteratorAggregate
      */
     public function emit($event) : Event
     {
-        $this->events_emitted[] = $event;
+        if ($this->hasListeners($event->getName()) || $this->hasListeners('*')) {
+            $this->events_emitted[] = $event;
+        }
 
         return parent::emit($event);
     }
 
     /**
-     * Wait for an event (based on event's name).
-     * Not async.
+     * Fin an event (based on event's name).
      */
-    public function waitFor(string $event_name, int $timeout = 10) : Event
+    public function find(string $event_name) : Event
     {
-        // Tick rate definitions
-        $tick_count = 0;
-        $tick_delay = 10000;
+        // Get all messages dispatched with the same name
+        $messages = array_filter($this->getEventsEmitted(), function ($message) use ($event_name) {
+            return $message->getName() === $event_name;
+        });
 
-        do {
-            // Get all messages dispatched with the same name
-            $messages = array_filter($this->getEventsEmitted(), function ($message) use ($event_name) {
-                return $message->getName() === $event_name;
-            });
+        // Get the last element (most recent) in the result
+        $message = array_pop($messages);
 
-            // Get the last element (most recent) in the result
-            $message = array_pop($messages);
+        // If the element is not null, return the event !
+        if (null !== $message) {
+            return $message;
+        }
 
-            // If the element is not null, return the event !
-            if (null !== $message) {
-                return $message;
-            }
-
-            // Wait for tick
-            usleep($tick_delay);
-
-            // Increment the tick count
-            ++$tick_count;
-        } while ($tick_count * $tick_delay < $timeout * 1000000);
-
-        throw new Exception('Timeout reached');
+        throw new Exception('Event not found');
     }
 
     /**

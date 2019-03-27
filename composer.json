@@ -32,7 +32,7 @@
     },
 
     "autoload": {
-        "psr-4": { "API\\Message\\": "src/" }
+        "psr-4": { "Kdubuc\\Message\\": "src/" }
     },
 
     "scripts": {

@@ -1,8 +1,8 @@
 <?php
 
-namespace API\Message\Event;
+namespace Kdubuc\Message\Event;
 
-use API\Message\Message;
+use Kdubuc\Message\Message;
 use League\Event\EventInterface;
 use League\Event\EmitterInterface as Emitter;
 
@@ -31,7 +31,7 @@ abstract class Event extends Message implements EventInterface
      */
     public function stopPropagation() : void
     {
-        true === $this->propagation_stopped;
+        $this->propagation_stopped = true;
     }
 
     /**

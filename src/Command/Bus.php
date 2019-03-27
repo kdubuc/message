@@ -1,6 +1,6 @@
 <?php
 
-namespace API\Message\Command;
+namespace Kdubuc\Message\Command;
 
 use Exception;
 use ReflectionParameter;
@@ -40,7 +40,7 @@ class Bus extends TacticianBus
 
         // We don't dispatch a message that was already dispatched before
         if (\array_key_exists($command->getId(), $this->dispatched_commands)) {
-            throw new Exception($command->getShortName().' (id: '.$command->getId().') already dispatched');
+            throw new Exception($command->getName().' (id: '.$command->getId().') already dispatched');
         }
 
         // Register the dispatched message
@@ -68,11 +68,14 @@ class Bus extends TacticianBus
     /**
      * Map a command handler with a specific command message.
      */
-    public function subscribe(Handler $handler) : void
+    public function subscribe(Handler $handler, string $command_class_name = null) : void
     {
-        $handler_parameter_reflection = new ReflectionParameter([\get_class($handler), '__invoke'], 0);
+        // If no command class name provided, we guess it from the invoke arg handler method
+        if (null === $command_class_name) {
+            $handler_parameter_reflection = new ReflectionParameter([\get_class($handler), '__invoke'], 0);
 
-        $command_class_name = $handler_parameter_reflection->getClass()->name;
+            $command_class_name = $handler_parameter_reflection->getClass()->name;
+        }
 
         $this->locator->addHandler($handler, $command_class_name);
     }

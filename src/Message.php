@@ -1,6 +1,6 @@
 <?php
 
-namespace API\Message;
+namespace Kdubuc\Message;
 
 use Datetime;
 use ArrayIterator;
@@ -26,10 +26,7 @@ abstract class Message implements JsonSerializable
 
         foreach ($attributes as $attribute => $type) {
             if (\array_key_exists($attribute, $payload)) {
-                $value = $payload[$attribute];
-                if (\is_array($value) && \array_key_exists('class_name', $value)) {
-                    $value = $value['class_name']::denormalize($value);
-                }
+                $value                  = $payload[$attribute];
                 $construct_parameters[] = $value;
             }
         }
@@ -125,7 +122,7 @@ abstract class Message implements JsonSerializable
     }
 
     /**
-     * Fill the message payload.
+     * Fill the message payload according to the __contruct signature and data values.
      */
     public function fillPayload(array $data = []) : self
     {
@@ -159,6 +156,16 @@ abstract class Message implements JsonSerializable
     {
         if (\is_object($value)) {
             throw new \Exception("Le payload d'un message ne peut contenir un objet");
+        }
+
+        $attributes = $this->getAttributes();
+
+        if (!\array_key_exists($name, $attributes)) {
+            throw new \Exception("La propriété $name n'existe pas dans la signature du message");
+        }
+
+        if (!\gettype($value) === $attributes[$name]) {
+            throw new \Exception("La propriété $name doit être du type ".$attributes[$name]);
         }
 
         $this->{"payload_$name"} = $value;
