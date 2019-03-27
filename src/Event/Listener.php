@@ -2,20 +2,7 @@
 
 namespace Kdubuc\Message\Event;
 
-use League\Event\AbstractListener;
-use League\Event\EventInterface as Event;
-
-abstract class Listener extends AbstractListener
+interface Listener
 {
-    /**
-     * Handle the event.
-     */
-    public function handle(Event $event) : void
-    {
-        $method_name = 'handle'.$event->getName();
-
-        if (method_exists($this, $method_name)) {
-            $this->$method_name($event);
-        }
-    }
+    public function __invoke(Event $event) : void;
 }

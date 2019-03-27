@@ -5,6 +5,7 @@ use Kdubuc\Message\Event\Event;
 use PHPUnit\Framework\TestCase;
 use Kdubuc\Message\Event\Stream;
 use Kdubuc\Message\Event\Listener;
+use Kdubuc\Message\Event\Polymorph;
 
 class EventTest extends TestCase
 {
@@ -45,12 +46,10 @@ class EventTest extends TestCase
             }
         };
 
-        $listener = $this->getMockBuilder(Listener::class)->setMethods(['handleEventTest'])->getMock();
+        $listener = $this->getMockBuilder(Polymorph::class)->setMethods(['handleEventTest'])->getMock();
         $listener->expects($this->once())->method('handleEventTest')->with($this->equalTo($event));
 
-        $listener->handle($event);
-
-        $this->assertInstanceOf(League\Event\AbstractListener::class, $listener);
+        $listener->__invoke($event);
     }
 
     public function testEventStream()
@@ -76,11 +75,11 @@ class EventTest extends TestCase
         $this->assertCount(0, $stream->getEventsEmitted());
 
         $listener1 = $this->createMock(Listener::class);
-        $listener1->expects($this->exactly(2))->method('handle')->withConsecutive([$this->equalTo($event1)], [$this->equalTo($event2)]);
+        $listener1->expects($this->exactly(2))->method('__invoke')->withConsecutive([$this->equalTo($event1)], [$this->equalTo($event2)]);
         $stream->attachListener($listener1);
 
         $listener2 = $this->createMock(Listener::class);
-        $listener2->expects($this->once())->method('handle')->with($this->equalTo($event2));
+        $listener2->expects($this->once())->method('__invoke')->with($this->equalTo($event2));
         $stream->attachListener($listener2, ['EventTest2']);
 
         $stream->emit($event1);
