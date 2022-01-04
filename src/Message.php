@@ -110,7 +110,7 @@ abstract class Message implements JsonSerializable
      */
     public static function getAttributes() : array
     {
-        $method = new ReflectionMethod(\get_called_class(), '__construct');
+        $method = new ReflectionMethod(static::class, '__construct');
 
         $attributes = array_reduce($method->getParameters(), function ($result, $parameter) {
             $result[$parameter->getName()] = $parameter->getType()->__toString();
@@ -130,7 +130,7 @@ abstract class Message implements JsonSerializable
 
         $data = (array) new ArrayIterator(array_filter($data, function ($k) use ($attributes) {
             return \in_array($k, array_keys($attributes));
-        }, ARRAY_FILTER_USE_KEY));
+        }, \ARRAY_FILTER_USE_KEY));
 
         foreach ($attributes as $name => $type) {
             $value = $data[$name];
@@ -181,7 +181,7 @@ abstract class Message implements JsonSerializable
         return [
             'id'          => $this->getId(),
             'name'        => $this->getName(),
-            'class_name'  => \get_called_class(),
+            'class_name'  => static::class,
             'record_date' => $this->getRecordDate()->format('Y-m-d\TH:i:s.u'),
             'payload'     => $this->getPayload(),
         ];
